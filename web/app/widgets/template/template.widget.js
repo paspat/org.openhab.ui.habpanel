@@ -14,8 +14,8 @@
             });
         });
 
-    widgetTemplate.$inject = ['$rootScope', '$compile', '$filter', 'OHService'];
-    function widgetTemplate($rootScope, $compile, $filter, OHService) {
+    widgetTemplate.$inject = ['$rootScope', '$compile', '$filter', '$uibModal', 'OHService'];
+    function widgetTemplate($rootScope, $compile, $filter, modal, OHService) {
         // Usage: <widget-template ng-model="widget" />
         //
         // Creates: A template widget
@@ -103,6 +103,14 @@
 
                 OHService.sendCmd(item.name, cmd);
             }
+            
+            scope.openModal = function(options){
+                options = angular.extend({},options,{
+                    'scope': scope
+                }); 
+
+                modal.open(options);
+            }            
 
             scope.$on("refreshTemplate", function () {
                 render();
