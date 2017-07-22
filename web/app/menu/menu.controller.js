@@ -196,6 +196,10 @@
             if (erase_config && $scope.form.tile.custom_widget_config) {
                 $scope.form.tile.custom_widget_config = {};
             }
+            
+            angular.forEach($scope.widgetsettings, function (setting) {
+                setting.group = setting.group || 'General';
+            });
         };
 
         $scope.submit = function() {
@@ -218,9 +222,19 @@
                     $modalInstance.close(dashboards);
                 });
             });
-        };
+        };              
 
         $scope.updateCustomWidgetSettings(false);
+        
+        $scope.groups = function() {
+            var result = [];
+            
+            angular.forEach($scope.widgetsettings, function (setting) {
+                if(result.indexOf(setting.group)==-1) result.push(setting.group);
+            });
+            
+            return result;
+        };        
     }
     
 })();

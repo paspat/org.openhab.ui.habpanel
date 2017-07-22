@@ -167,6 +167,7 @@
         if ($scope.widget.customwidget || $scope.widget.settings || $scope.widget.preview) {
             $scope.form.config = $scope.widget.config || {};
             angular.forEach($scope.widgetsettings, function (setting) {
+                setting.group = setting.group || 'General';
                 if (setting.type !== 'icon' && setting.type !== 'heading'
                 && setting.default && ($scope.form.config[setting.id] === undefined)) {
                     $scope.form.config[setting.id] = setting.default;
@@ -209,6 +210,16 @@
         $scope.exportToFile = function() {
             var data = new Blob([$scope.form.template], { type: 'text/html;charset=utf-8'});
             FileSaver.saveAs(data, $scope.form.name + '.tpl.html');
+        };
+    
+        $scope.groups = function() {
+            var result = [];
+            
+            angular.forEach($scope.widgetsettings, function (setting) {
+                if(result.indexOf(setting.group)==-1) result.push(setting.group);
+            });
+            
+            return result;
         };
 
         $timeout(function () {

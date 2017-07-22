@@ -82,6 +82,12 @@
                                         <input name="name" type="text" ng-model="setting.label" class="form-control" required />
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-2">Group</label>
+                                    <div class="col-md-10">
+                                        <input name="name" type="text" ng-model="setting.group" class="form-control" />
+                                    </div>
+                                </div>
                                 <div class="form-group" ng-if="setting.type !== 'heading' && setting.type !== 'icon' && setting.type !== 'checkbox'">
                                     <label class="control-label col-md-2">Default value</label>
                                     <div class="col-md-10">
