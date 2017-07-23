@@ -63,6 +63,7 @@
                 $scope.$broadcast('rzSliderForceRender');
                 vm.previewmodel.row = 0;
                 vm.previewmodel.col = 0;
+                vm.previewmodel.dontwrap = vm.widget.dontwrap;
                 vm.previewmodel.customwidget_name = vm.widget.name || vm.widgetId;
                 vm.previewmodel.template = vm.widget.template;
                 vm.previewmodel.preview = true;

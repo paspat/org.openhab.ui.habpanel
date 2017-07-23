@@ -36,11 +36,13 @@
 
             function render() {
                 var template;
+                var dontwrap=scope.ngModel.dontwrap;
                 if ($rootScope.configWidgets[scope.ngModel.customwidget])
                     template = $rootScope.configWidgets[scope.ngModel.customwidget].template;
-                else if ($rootScope.customwidgets[scope.ngModel.customwidget])
+                else if ($rootScope.customwidgets[scope.ngModel.customwidget]){
                     template = $rootScope.customwidgets[scope.ngModel.customwidget].template;
-                else
+                    dontwrap = $rootScope.customwidgets[scope.ngModel.customwidget].dontwrap;
+                }else
                     template = scope.ngModel.template;
 
                 scope.config = scope.ngModel.config;
@@ -49,7 +51,7 @@
                     element[0].parentElement.parentElement.className += " no-bkg";
                 }
 
-                if (!scope.ngModel.dontwrap) {
+                if (!dontwrap) {
                     template = "<div class=\"box-content template-container\">" +
                                "<div class=\"template-contents\">" +
                                 template + "</div></div>";
@@ -164,9 +166,14 @@
             dontwrap    : widget.dontwrap,
             nobackground: widget.nobackground
         };
+        
+        $scope.dontwrapshow = true;
+        
         if ($scope.widget.customwidget || $scope.widget.settings || $scope.widget.preview) {
             $scope.form.config = $scope.widget.config || {};
+            $scope.dontwrapshow = false;
             angular.forEach($scope.widgetsettings, function (setting) {
+                setting.group = setting.group || 'General';
                 if (setting.type !== 'icon' && setting.type !== 'heading'
                 && setting.default && ($scope.form.config[setting.id] === undefined)) {
                     $scope.form.config[setting.id] = setting.default;
