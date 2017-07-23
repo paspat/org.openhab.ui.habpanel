@@ -10,6 +10,9 @@
         var vm = this;
         vm.widgetId = $routeParams.id;
         vm.widget = angular.copy(widget);
+        
+        if(vm.widget.dontwrap===undefined)
+            vm.widget.dontwrap=false;
 
         vm.editorOptions = {
             lineNumbers  : true,

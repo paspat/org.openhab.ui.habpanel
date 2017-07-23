@@ -37,9 +37,10 @@
             function render() {
                 var template;
                 var dontwrap=scope.ngModel.dontwrap;
-                if ($rootScope.configWidgets[scope.ngModel.customwidget])
+                if ($rootScope.configWidgets[scope.ngModel.customwidget]){
                     template = $rootScope.configWidgets[scope.ngModel.customwidget].template;
-                else if ($rootScope.customwidgets[scope.ngModel.customwidget]){
+                    dontwrap = $rootScope.configWidgets[scope.ngModel.customwidget].dontwrap;
+                }else if ($rootScope.customwidgets[scope.ngModel.customwidget]){
                     template = $rootScope.customwidgets[scope.ngModel.customwidget].template;
                     dontwrap = $rootScope.customwidgets[scope.ngModel.customwidget].dontwrap;
                 }else
@@ -129,20 +130,24 @@
         $scope.widget = widget;
         $scope.items = OHService.getItems();
 
+        $scope.dontwrapshow = true;
 
         if ($scope.widget.preview) {
             // inline settings (used in the designer's preview)
             $scope.widgetsettings = angular.copy($scope.widget.settings);
             $scope.customwidget_name = $scope.widget.customwidget_name;
+            if($scope.widget.dontwrap !== undefined) $scope.dontwrapshow=false;
         } else {
             if ($scope.widget.customwidget) {
                 // get settings from custom widget
                 if ($rootScope.configWidgets[$scope.widget.customwidget]) {
                     $scope.widgetsettings = angular.copy($rootScope.configWidgets[$scope.widget.customwidget].settings);
                     $scope.customwidget_name = $rootScope.configWidgets[$scope.widget.customwidget].name;
+                    if($rootScope.configWidgets[$scope.widget.customwidget].dontwrap !== undefined) $scope.dontwrapshow=false;
                 } else {
                     $scope.widgetsettings = angular.copy($rootScope.customwidgets[$scope.widget.customwidget].settings);
                     $scope.customwidget_name = $rootScope.customwidgets[$scope.widget.customwidget].name;
+                    if($rootScope.customwidgets[$scope.widget.customwidget].dontwrap !== undefined) $scope.dontwrapshow=false;
                 }
             }
         }
@@ -167,11 +172,8 @@
             nobackground: widget.nobackground
         };
         
-        $scope.dontwrapshow = true;
-        
         if ($scope.widget.customwidget || $scope.widget.settings || $scope.widget.preview) {
             $scope.form.config = $scope.widget.config || {};
-            $scope.dontwrapshow = false;
             angular.forEach($scope.widgetsettings, function (setting) {
                 setting.group = setting.group || 'General';
                 if (setting.type !== 'icon' && setting.type !== 'heading'
