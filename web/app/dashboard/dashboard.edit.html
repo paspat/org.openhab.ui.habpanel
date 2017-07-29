@@ -46,7 +46,7 @@
             <div class="box box-design" ng-controller="CustomWidgetCtrl">
                 <div class="box-header pull-left" style="display: inline">
                     <i class="handle glyphicon glyphicon-move"></i>
-                    <h3>{{ widget.customwidget || widget.type }}</h3>
+                    <h3>{{ getCustomWidgetName(widget.customwidget) || widget.customwidget || widget.type }}</h3>
                 </div>
                 <div class="box-content box-label-content">
                     <div class="box-label">

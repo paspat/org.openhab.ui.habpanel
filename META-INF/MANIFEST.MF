@@ -5,10 +5,16 @@ Bundle-SymbolicName: org.openhab.ui.habpanel
 Bundle-Version: 2.2.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Service-Component: OSGI-INF/*.xml
-Import-Package: javax.servlet,
+Bundle-ClassPath: .,
+ lib/javax.json.javax.json-api-1.0.jar,
+ lib/org.glassfish.javax.json-1.0.4.jar
+Import-Package: com.google.gson;version="2.5.0",
+ javax.servlet,
  javax.servlet.http,
- org.openhab.ui.dashboard,
  org.apache.commons.io,
+ org.eclipse.smarthome.config.core,
+ org.eclipse.smarthome.core.service,
+ org.openhab.ui.dashboard,
  org.osgi.framework,
  org.osgi.service.component,
  org.osgi.service.http,

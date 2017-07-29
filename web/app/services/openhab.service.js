@@ -268,8 +268,23 @@
                         $rootScope.configWidgets[widgetname] = JSON.parse(value);
                     }
                 });
+                
+                //load config widgets from rest service
+                $http.get('configwidgets').then(function (resp) {
+                    angular.forEach(resp.data, function(packageData){
+                        angular.forEach(packageData.widgets, function(widget){
+                            var widgetname = packageData.packageId + '__' + widget.widgetId;
+                            delete widget.id;
+                            widget.packageId = packageData.packageId;
+                            console.log("Adding widget from configuration service: " + widgetname);
+                            $rootScope.configWidgets[widgetname] = widget;
+                        });
+                    });
+                    
+                    deferred.resolve();
+                });
 
-                deferred.resolve();
+                
 
             }, function (err) {
                 console.error('Cannot load openHAB 2 service configuration: ' + JSON.stringify(err));

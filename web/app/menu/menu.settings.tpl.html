@@ -146,8 +146,8 @@
                         <div class="col-lg-9 col-md-9">
                             <select ng-model="form.tile.custom_widget" ng-change="updateCustomWidgetSettings(true)" class="form-control">
                                 <option value=""></option>
-                                <option ng-repeat="(id, widget) in configWidgets" value="{{id}}">{{id}}</option>
-                                <option ng-repeat="(id, widget) in customwidgets" value="{{id}}">{{id}}</option>
+                                <option ng-repeat="(id, widget) in configWidgets" value="{{id}}">{{widget.name || id}}</option>
+                                <option ng-repeat="(id, widget) in customwidgets" value="{{id}}">{{widget.name || id}}</option>
                             </select>
                         </div>
                     </div>

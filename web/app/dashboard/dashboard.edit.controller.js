@@ -1,6 +1,6 @@
 angular.module('app')
-    .controller('DashboardEditCtrl', ['$scope', '$location', '$timeout', 'dashboard', 'Widgets', 'PersistenceService', 'OHService',
-        function($scope, $location, $timeout, dashboard, Widgets, PersistenceService, OHService) {
+    .controller('DashboardEditCtrl', ['$scope', '$rootScope', '$location', '$timeout', 'dashboard', 'Widgets', 'PersistenceService', 'OHService',
+        function($scope, $rootScope, $location, $timeout, dashboard, Widgets, PersistenceService, OHService) {
 
             $scope.dashboard = dashboard;
 
@@ -87,6 +87,14 @@ angular.module('app')
                     type: "template",
                     customwidget: id
                 })
+            }
+            
+            $scope.getCustomWidgetName = function(id) {
+                var widget = $rootScope.configWidgets[id];
+                if(widget!=null)
+                    return widget.name || id;
+                
+                return null;
             }
 
             $scope.save = function() {
