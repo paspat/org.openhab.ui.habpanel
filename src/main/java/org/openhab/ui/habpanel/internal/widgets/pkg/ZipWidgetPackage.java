@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2015-2016 by the respective copyright holders.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.ui.habpanel.internal.widgets.pkg;
 
 import java.io.BufferedInputStream;
@@ -11,6 +19,11 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ *
+ * @author Patrick Spiss
+ *
+ */
 public class ZipWidgetPackage extends AbstractWidgetPackage {
 
     private final static Logger logger = LoggerFactory.getLogger(ZipWidgetPackage.class);
@@ -43,6 +56,11 @@ public class ZipWidgetPackage extends AbstractWidgetPackage {
 
 }
 
+/**
+ *
+ * @author Patrick Spiss
+ *
+ */
 class ZipWidgetInputStream extends BufferedInputStream {
 
     private ZipFile zip;
