@@ -52,7 +52,6 @@ public class WidgetServlet extends HttpServlet {
         gsonBuilder.registerTypeHierarchyAdapter(WidgetPackage.class, new WidgetPackageJsonSerializer());
         gsonBuilder.registerTypeHierarchyAdapter(Widget.class, new WidgetJsonSerializer());
         gsonBuilder.registerTypeHierarchyAdapter(WidgetSetting.class, new WidgetSettingJsonSerializer());
-        // gsonBuilder.registerTypeAdapter(WidgetPackage.class, new WidgetPackageJsonSerializer());
         Gson gson = gsonBuilder.create();
 
         if (req.getPathInfo() != null && !req.getPathInfo().trim().equals("/")) {

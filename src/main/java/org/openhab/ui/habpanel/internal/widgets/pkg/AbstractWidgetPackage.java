@@ -41,12 +41,14 @@ import com.google.gson.JsonObject;
 public abstract class AbstractWidgetPackage implements WidgetPackage {
 
     private final static Logger logger = LoggerFactory.getLogger(AbstractWidgetPackage.class);
-    private final static String WIDGET_CONFIG_FILE = "widgets.json";
+    private final static String PACKAGE_CONFIG_FILE = "widget-package.json";
 
     protected BundleContext context;
     protected ServiceRegistration<WidgetPackage> service;
     protected transient File path;
     protected List<Widget> widgets = new ArrayList<Widget>();
+    protected List<String> css = new ArrayList<String>();
+    protected List<String> scripts = new ArrayList<String>();
 
     @Override
     public String getPackageId() {
@@ -86,50 +88,69 @@ public abstract class AbstractWidgetPackage implements WidgetPackage {
         logger.debug("Process package descriptor from '{}'", path);
 
         this.widgets = new ArrayList<Widget>();
+        this.css = new ArrayList<String>();
+        this.scripts = new ArrayList<String>();
 
-        InputStream widgetsIn = this.getResource(WIDGET_CONFIG_FILE);
-        if (widgetsIn == null) {
-            logger.error("Could not find {}", WIDGET_CONFIG_FILE);
+        InputStream configIn = this.getResource(PACKAGE_CONFIG_FILE);
+        if (configIn == null) {
+            logger.error("Could not find {}", PACKAGE_CONFIG_FILE);
         } else {
             Gson gson = new Gson();
-            JsonObject widgets = gson.fromJson(new InputStreamReader(widgetsIn), JsonObject.class);
-            if (widgets != null) {
-                Iterator<Entry<String, JsonElement>> it = widgets.entrySet().iterator();
-                while (it.hasNext()) {
-                    Entry<String, JsonElement> widgetEntry = it.next();
-                    JsonObject widgetJson = null;
+            JsonObject config = gson.fromJson(new InputStreamReader(configIn), JsonObject.class);
+            if (config != null) {
+                Iterator<Entry<String, JsonElement>> itConfig = config.entrySet().iterator();
+                while (itConfig.hasNext()) {
+                    Entry<String, JsonElement> configEntry = itConfig.next();
 
-                    if (widgetEntry.getValue().isJsonObject()) {
-                        logger.debug("Load widget config for '{}' from json object", widgetEntry.getKey());
-                        widgetJson = widgetEntry.getValue().getAsJsonObject();
-                    } else if (widgetEntry.getValue().isJsonPrimitive()) {
-                        String value = widgetEntry.getValue().getAsString();
-                        if (value.length() > 11 && value.substring(0, 11).equals("resource://")) {
-                            logger.debug("Load widget config for '{}' from resource '{}'", widgetEntry.getKey(),
-                                    value.substring(11));
-                            InputStream widgetDefIn = this.getResource(value.substring(11));
-                            if (widgetDefIn != null) {
-                                widgetJson = gson.fromJson(new InputStreamReader(widgetDefIn), JsonObject.class);
-                                try {
-                                    widgetDefIn.close();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
+                    if (configEntry.getKey().equals("resources") && configEntry.getValue().isJsonObject()) {
+                        JsonObject resources = configEntry.getValue().getAsJsonObject();
+                        loadResources(resources, "css", this.css);
+                        loadResources(resources, "scripts", this.scripts);
+
+                    } else if (configEntry.getKey().equals("widgets") && configEntry.getValue().isJsonObject()) {
+                        Iterator<Entry<String, JsonElement>> itWidgets = configEntry.getValue().getAsJsonObject()
+                                .entrySet().iterator();
+
+                        while (itWidgets.hasNext()) {
+                            Entry<String, JsonElement> widgetEntry = itWidgets.next();
+
+                            JsonObject widgetJson = null;
+
+                            if (widgetEntry.getValue().isJsonObject()) {
+                                logger.debug("Load widget config for '{}' from json object", widgetEntry.getKey());
+                                widgetJson = widgetEntry.getValue().getAsJsonObject();
+                            } else if (widgetEntry.getValue().isJsonPrimitive()) {
+                                String value = widgetEntry.getValue().getAsString();
+                                if (value.length() > 11 && value.substring(0, 11).equals("resource://")) {
+                                    logger.debug("Load widget config for '{}' from resource '{}'", widgetEntry.getKey(),
+                                            value.substring(11));
+                                    InputStream widgetDefIn = this.getResource(value.substring(11));
+                                    if (widgetDefIn != null) {
+                                        widgetJson = gson.fromJson(new InputStreamReader(widgetDefIn),
+                                                JsonObject.class);
+                                        try {
+                                            widgetDefIn.close();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
                                 }
                             }
-                        }
-                    }
 
-                    if (widgetJson != null) {
-                        GsonBuilder builder = new GsonBuilder();
-                        builder.registerTypeAdapter(Widget.class, new WidgetJsonSerializer(widgetEntry.getKey()));
-                        builder.registerTypeAdapter(WidgetSetting.class, new WidgetSettingJsonSerializer());
-                        this.widgets.add(builder.create().fromJson(widgetJson, Widget.class));
+                            if (widgetJson != null) {
+                                GsonBuilder builder = new GsonBuilder();
+                                builder.registerTypeAdapter(Widget.class,
+                                        new WidgetJsonSerializer(widgetEntry.getKey()));
+                                builder.registerTypeAdapter(WidgetSetting.class, new WidgetSettingJsonSerializer());
+                                this.widgets.add(builder.create().fromJson(widgetJson, Widget.class));
+                            }
+                        }
                     }
                 }
             }
 
             try {
-                widgetsIn.close();
+                configIn.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -153,8 +174,30 @@ public abstract class AbstractWidgetPackage implements WidgetPackage {
     }
 
     @Override
+    public List<String> getCSSResources() {
+        return this.css;
+    }
+
+    @Override
+    public List<String> getScriptResources() {
+        return this.scripts;
+    }
+
+    @Override
     public String toString() {
         return this.getClass().getSimpleName() + " [path=" + this.path + "]";
+    }
+
+    private void loadResources(JsonObject resources, String name, List<String> list) {
+        if (resources.has(name) && resources.get(name).isJsonArray()) {
+            Iterator<JsonElement> it = resources.get(name).getAsJsonArray().iterator();
+            while (it.hasNext()) {
+                JsonElement elem = it.next();
+                if (elem.isJsonPrimitive()) {
+                    list.add(elem.getAsString());
+                }
+            }
+        }
     }
 
 }

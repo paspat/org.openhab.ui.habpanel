@@ -26,4 +26,8 @@ public interface WidgetPackage {
 
     List<Widget> getWidgets();
 
+    List<String> getCSSResources();
+
+    List<String> getScriptResources();
+
 }

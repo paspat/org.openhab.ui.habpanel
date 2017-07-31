@@ -233,8 +233,8 @@
 
     }
 
-    OH2StorageService.$inject = ['OH2ServiceConfiguration', '$rootScope', '$http', '$q', 'localStorageService'];
-    function OH2StorageService(OH2ServiceConfiguration, $rootScope, $http, $q, localStorageService) {
+    OH2StorageService.$inject = ['OH2ServiceConfiguration', '$rootScope', '$http', '$q', 'localStorageService','$ocLazyLoad'];
+    function OH2StorageService(OH2ServiceConfiguration, $rootScope, $http, $q, localStorageService,$ocLazyLoad) {
         var SERVICE_NAME = 'org.openhab.habpanel';
 
         this.tryGetServiceConfiguration = tryGetServiceConfiguration;
@@ -272,16 +272,35 @@
                 //load config widgets from rest service
                 $http.get('configwidgets').then(function (resp) {
                     angular.forEach(resp.data, function(packageData){
-                        angular.forEach(packageData.widgets, function(widget){
-                            var widgetname = packageData.packageId + '__' + widget.widgetId;
-                            delete widget.id;
-                            widget.packageId = packageData.packageId;
-                            console.log("Adding widget from configuration service: " + widgetname);
-                            $rootScope.configWidgets[widgetname] = widget;
-                        });
-                    });
-                    
-                    deferred.resolve();
+                        if(angular.isObject(packageData.resources)){
+                            var load = [];
+                            angular.forEach(packageData.resources.css, function(css){
+                                if(css.length>8 && css.substr(0,7)!='http://' && css.substr(0,8)!='https://'){
+                                    load.push('configwidgets/' + packageData.packageId + '/' + css);
+                                }else{
+                                    load.push(css);
+                                }
+                            });
+                            angular.forEach(packageData.resources.script, function(script){
+                                if(script.length>8 && script.substr(0,7)!='http://' && script.substr(0,8)!='https://'){
+                                    load.push('configwidgets/' + packageData.packageId + '/' + script);
+                                }else{
+                                    load.push(script);
+                                }
+                            });                            
+                            $ocLazyLoad.load(load).then(function(){
+                                angular.forEach(packageData.widgets, function(widget){
+                                    var widgetname = packageData.packageId + '__' + widget.widgetId;
+                                    delete widget.id;
+                                    widget.packageId = packageData.packageId;
+                                    console.log("Adding widget from configuration service: " + widgetname);
+                                    $rootScope.configWidgets[widgetname] = widget;
+                                });
+                                
+                                deferred.resolve();
+                            });
+                        }                      
+                    });                                       
                 });
 
                 

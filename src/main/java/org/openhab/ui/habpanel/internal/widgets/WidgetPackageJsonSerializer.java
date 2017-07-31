@@ -34,6 +34,11 @@ public class WidgetPackageJsonSerializer implements JsonSerializer<WidgetPackage
         ret.addProperty("name", pkg.getName());
         ret.add("widgets", context.serialize(pkg.getWidgets()));
 
+        JsonObject resources = new JsonObject();
+        resources.add("css", context.serialize(pkg.getCSSResources()));
+        resources.add("script", context.serialize(pkg.getScriptResources()));
+        ret.add("resources", resources);
+
         return ret;
 
     }
