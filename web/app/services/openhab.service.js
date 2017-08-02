@@ -271,35 +271,16 @@
                 
                 //load config widgets from rest service
                 $http.get('configwidgets').then(function (resp) {
-                    angular.forEach(resp.data, function(packageData){
-                        if(angular.isObject(packageData.resources)){
-                            var load = [];
-                            angular.forEach(packageData.resources.css, function(css){
-                                if(css.length>8 && css.substr(0,7)!='http://' && css.substr(0,8)!='https://'){
-                                    load.push('configwidgets/' + packageData.packageId + '/' + css);
-                                }else{
-                                    load.push(css);
-                                }
-                            });
-                            angular.forEach(packageData.resources.script, function(script){
-                                if(script.length>8 && script.substr(0,7)!='http://' && script.substr(0,8)!='https://'){
-                                    load.push('configwidgets/' + packageData.packageId + '/' + script);
-                                }else{
-                                    load.push(script);
-                                }
-                            });                            
-                            $ocLazyLoad.load(load).then(function(){
-                                angular.forEach(packageData.widgets, function(widget){
-                                    var widgetname = packageData.packageId + '__' + widget.widgetId;
-                                    delete widget.id;
-                                    widget.packageId = packageData.packageId;
-                                    console.log("Adding widget from configuration service: " + widgetname);
-                                    $rootScope.configWidgets[widgetname] = widget;
-                                });
-                                
-                                deferred.resolve();
-                            });
-                        }                      
+                    var promises = [];
+                    angular.forEach(resp.data, function(packageData) {
+                        
+                        if(angular.isObject(packageData.resources)) {
+                            promises.push(loadConfigWidget(packageData));
+                        }
+                    });
+                    
+                    $q.all(promises).then(function(){
+                        deferred.resolve();
                     });                                       
                 });
 
@@ -311,6 +292,40 @@
                 deferred.reject();
             });
 
+            return deferred.promise;
+        }
+        
+        function loadConfigWidget(packageData) {
+            var deferred = $q.defer();
+            
+            var load = [];
+            angular.forEach(packageData.resources.css, function(css){
+                if(css.length>8 && css.substr(0,7)!='http://' && css.substr(0,8)!='https://'){
+                    load.push('configwidgets/' + packageData.packageId + '/' + css);
+                }else{
+                    load.push(css);
+                }
+            });
+            angular.forEach(packageData.resources.script, function(script){
+                if(script.length>8 && script.substr(0,7)!='http://' && script.substr(0,8)!='https://'){
+                    load.push('configwidgets/' + packageData.packageId + '/' + script);
+                }else{
+                    load.push(script);
+                }
+            });
+            
+            $ocLazyLoad.load(load).then(function(){
+                angular.forEach(packageData.widgets, function(widget){
+                    var widgetname = packageData.packageId + '__' + widget.widgetId;
+                    delete widget.id;
+                    widget.packageId = packageData.packageId;
+                    console.log("Adding widget from configuration service: " + widgetname);
+                    $rootScope.configWidgets[widgetname] = widget;
+                });
+                
+                deferred.resolve();
+            });
+            
             return deferred.promise;
         }
 
