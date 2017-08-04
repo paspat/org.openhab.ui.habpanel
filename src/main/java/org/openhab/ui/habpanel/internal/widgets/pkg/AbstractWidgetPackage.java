@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.commons.io.IOUtils;
 import org.openhab.ui.habpanel.Widget;
 import org.openhab.ui.habpanel.WidgetPackage;
 import org.openhab.ui.habpanel.WidgetSetting;
@@ -121,7 +122,7 @@ public abstract class AbstractWidgetPackage implements WidgetPackage {
                                 widgetJson = widgetEntry.getValue().getAsJsonObject();
                             } else if (widgetEntry.getValue().isJsonPrimitive()) {
                                 String value = widgetEntry.getValue().getAsString();
-                                if (value.length() > 11 && value.substring(0, 11).equals("resource://")) {
+                                if (value.length() > 11 && value.startsWith("resource://")) {
                                     logger.debug("Load widget config for '{}' from resource '{}'", widgetEntry.getKey(),
                                             value.substring(11));
                                     InputStream widgetDefIn = this.getResource(value.substring(11));
@@ -131,7 +132,6 @@ public abstract class AbstractWidgetPackage implements WidgetPackage {
                                         try {
                                             widgetDefIn.close();
                                         } catch (IOException e) {
-                                            e.printStackTrace();
                                         }
                                     }
                                 }
@@ -142,7 +142,30 @@ public abstract class AbstractWidgetPackage implements WidgetPackage {
                                 builder.registerTypeAdapter(Widget.class,
                                         new WidgetJsonSerializer(widgetEntry.getKey()));
                                 builder.registerTypeAdapter(WidgetSetting.class, new WidgetSettingJsonSerializer());
-                                this.widgets.add(builder.create().fromJson(widgetJson, Widget.class));
+
+                                Widget widget = builder.create().fromJson(widgetJson, Widget.class);
+                                if (widget.getTemplate().length() > 11
+                                        && widget.getTemplate().startsWith("resource://")) {
+                                    logger.debug("Load widget template from resource '{}'",
+                                            widget.getTemplate().substring(11));
+                                    InputStream widgetTemplateIn = this.getResource(widget.getTemplate().substring(11));
+                                    if (widgetTemplateIn != null) {
+                                        try {
+                                            widget.setTemplate(IOUtils.toString(widgetTemplateIn));
+                                        } catch (IOException e) {
+                                            logger.error("Could not load template resource '{}'",
+                                                    widget.getTemplate().substring(11), e);
+                                        } finally {
+                                            try {
+                                                widgetTemplateIn.close();
+                                            } catch (IOException e) {
+                                            }
+                                        }
+                                    } else {
+                                        widget.setTemplate("");
+                                    }
+                                }
+                                this.widgets.add(widget);
                             }
                         }
                     }
