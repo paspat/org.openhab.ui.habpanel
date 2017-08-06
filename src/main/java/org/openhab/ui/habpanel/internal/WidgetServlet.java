@@ -81,6 +81,7 @@ public class WidgetServlet extends HttpServlet {
                         resp.sendError(404);
                     } else {
                         IOUtils.copy(in, resp.getOutputStream());
+                        in.close();
                     }
                 }
             }
