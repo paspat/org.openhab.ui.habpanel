@@ -319,8 +319,7 @@
                     var widgetname = packageData.packageId + '__' + widget.widgetId;
                     delete widget.id;
                     widget.packageId = packageData.packageId;
-                    if(widget.template!=null)
-                        widget.template = widget.template.replace(/%%resource-path%%/g,'configwidgets/' + packageData.packageId);
+                    widget.resourcePath = 'configwidgets/' + packageData.packageId;
                     console.log("Adding widget from configuration service: " + widgetname);
                     $rootScope.configWidgets[widgetname] = widget;
                 });

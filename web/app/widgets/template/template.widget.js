@@ -36,9 +36,10 @@
 
             function render() {
                 var template;
-                if ($rootScope.configWidgets[scope.ngModel.customwidget])
+                if ($rootScope.configWidgets[scope.ngModel.customwidget]){
                     template = $rootScope.configWidgets[scope.ngModel.customwidget].template;
-                else if ($rootScope.customwidgets[scope.ngModel.customwidget])
+                    scope.resourcePath = $rootScope.configWidgets[scope.ngModel.customwidget].resourcePath
+                }else if ($rootScope.customwidgets[scope.ngModel.customwidget])
                     template = $rootScope.customwidgets[scope.ngModel.customwidget].template;
                 else
                     template = scope.ngModel.template;
