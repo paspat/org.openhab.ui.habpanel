@@ -103,20 +103,7 @@
                 }
 
                 OHService.sendCmd(item.name, cmd);
-            }
-            
-            scope.getResource = function(path, packageId) {
-                if(packageId!=null){
-                    return 'configwidgets/' + packageId + '/' + path;
-                } else {
-                    var configwidget = $rootScope.configWidgets[scope.ngModel.customwidget];
-                    if (configwidget){
-                        return 'configwidgets/' + configwidget.packageId + '/' + path;
-                    }
-                }
-                
-                return null;
-            }           
+            }          
 
             scope.$on("refreshTemplate", function () {
                 render();
